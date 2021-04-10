@@ -1,4 +1,4 @@
-# sandbox-competition-solution-website
+# sandbox
 
 ## Project setup
 ```
