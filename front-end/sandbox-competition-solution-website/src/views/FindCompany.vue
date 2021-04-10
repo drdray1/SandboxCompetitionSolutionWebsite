@@ -19,8 +19,8 @@
         </li>
       </ul>
     </div>
-    <div class="card">
-      <img class="card-img-top m-5" src="../../../../assets/amazon_logo.png" alt="Card image cap" style="width: auto">
+    <div v-if="job != null" class="card">
+      <img class="card-img-top m-5" :src="job.path" alt="Card image cap" style="width: 200px; height: 80px;">
       <div class="card-body justify-content-center">
         <h5 class="card-title">{{ job.name }}</h5>
         <p class="card-text">Job Title: {{ job.job_title }}</p>
@@ -29,7 +29,7 @@
         <div class="container">
           <div class="row">
             <div class="col">
-              <svg xmlns="http://www.w3.org/2000/svg" width="75" height="75" fill="#DB1200" class="bi bi-x-circle" viewBox="0 0 16 16">
+              <svg @click="getNextJob" xmlns="http://www.w3.org/2000/svg" width="75" height="75" fill="#DB1200" class="bi bi-x-circle" viewBox="0 0 16 16">
                 <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
                 <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
               </svg>
@@ -44,6 +44,9 @@
         </div>
       </div>
     </div>
+    <div v-else>
+      There are no Jobs available
+    </div>
   </div>
 </template>
 
@@ -57,9 +60,11 @@ export default {
     return {
       counter: 0,
 
-      job: {},
+      job: null,
 
-      jobs: [
+      jobs: [],
+
+      /*jobs: [
         {
           name: "Tesla",
           job_title: "Stress Tester",
@@ -78,12 +83,12 @@ export default {
           location: "Seattle, WA",
           description: "Proficient in ..."
         },
-      ],
+      ],*/
     }
   },
 
   created() {
-    //this.getJobs();
+    this.getJobs();
     this.getNextJob();
   },
 
@@ -98,8 +103,9 @@ export default {
     },
     async getJobs() {
       try {
-        let response = await axios.get("/api/sandbox/profiles");
+        let response = await axios.get("/api/sandbox/jobs");
         this.jobs = response.data;
+        this.job = this.jobs[0];
         return true;
       } catch (error) {
         console.log(error);
@@ -109,4 +115,5 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+</style>

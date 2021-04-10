@@ -15,6 +15,17 @@ mongoose.connect('mongodb://localhost:27017/sandbox', {
 });
 console.log("Connected to database");
 
+// Setup Multer
+const multer = require('multer')
+
+const upload = multer({
+    dest: '../front-end/sandbox-competition-solution-website/public/images/',
+    limits: {
+        fileSize: 10000000
+    }
+})
+console.log("Multer Ready")
+
 // Path to database
 const databasePath = '/api/sandbox';
 
@@ -26,6 +37,10 @@ const portNum = 3000;
 const studentProfileSchema = new mongoose.Schema({
     first_name: String,
     last_name: String,
+    bio: String,
+    school: String,
+    cooperative_score: Number,
+    path: String,
 });
 
 const StudentProfile = mongoose.model('StudentProfile', studentProfileSchema);
@@ -36,12 +51,24 @@ const jobListing = new mongoose.Schema({
     name: String,
     job_title: String,
     location: String,
+    cooperative_score: Number,
     description: String,
+    path: String,
 });
 
 const JobListing = mongoose.model('JobListing', jobListing);
 console.log("Job Listing Schema created")
 // CRUD
+
+// Photo Upload
+app.post('/api/photos', upload.single('photo'), async (req, res) => {
+    if (!req.file) {
+        return res.sendStatus(400);
+    }
+    res.send({
+        path: "/images/" + req.file.filename
+    });
+});
 
 // Create
 // Create a Student Profile
@@ -49,6 +76,10 @@ app.post(databasePath + '/profiles', async (req, res) => {
     const studentProfile = new StudentProfile({
         first_name: req.body.first_name,
         last_name: req.body.last_name,
+        school: req.body.school,
+        bio: req.body.bio,
+        cooperative_score: req.body.cooperative_score,
+        path: req.body.path,
     });
     try {
         await studentProfile.save();
@@ -66,7 +97,9 @@ app.post(databasePath + '/jobs', async (req, res) => {
         name: req.body.name,
         job_title: req.body.job_title,
         location: req.body.location,
+        cooperative_score: req.body.cooperative_score,
         description: req.body.description,
+        path: req.body.path,
     });
     try {
         await jobListing.save();
@@ -146,7 +179,7 @@ app.put(databasePath + '/profiles' + '/:student_profileID', async (req, res) => 
         }
         studentProfile.first_name = req.body.first_name;
         studentProfile.last_name = req.body.last_name;
-
+        studentProfile.bio = req.body.bio;
         await studentProfile.save();
         res.send(studentProfile);
         console.log("Student Profile One Updated")
